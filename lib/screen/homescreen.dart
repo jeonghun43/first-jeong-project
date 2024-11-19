@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(50),
                   color: Colors.lightBlueAccent,
                 ),
-                height: screenHeight * 0.2,
+                height: screenHeight * 0.195,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -128,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               "Error Code[5000] : data null \n 에러 발생 개발자에게 문의 부탁드립니다");
                         } else {
                           return SizedBox(
-                            height: screenHeight * 0.55,
+                            height: screenHeight * 0.45,
                             child: GridView.builder(
                                 itemCount: snapshot.data!.length,
                                 gridDelegate:
@@ -205,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ),
                 //*/
                 SizedBox(
-                  height: screenHeight * 0.05,
+                  height: screenHeight * 0.03,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
