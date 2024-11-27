@@ -139,6 +139,7 @@ class _EditpageState extends State<Editpage> {
 
   Future<List<Memo>> readamemo() async {
     var li = await dbh.readMemo(name);
+    content = li[0].content;
     print(li);
     return li;
   }
