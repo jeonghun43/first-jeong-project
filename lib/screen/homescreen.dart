@@ -23,11 +23,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int size = 0;
   Future? myFuture;
   List<String> pinContacts = [];
+  String searchText = "";
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
     _tabController = TabController(length: 2, vsync: this);
     myFuture = readContactsFromDatabase();
   }
@@ -179,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 child: Column(
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      // mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         TextButton(
                           style: TextButton.styleFrom(
@@ -221,7 +223,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 fontWeight: FontWeight.w900),
                           ),
                         ),
-                        IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+                        SizedBox(
+                          width: screenWidth * 0.45,
+                          child: TextField(
+                            decoration: InputDecoration(
+                                hintText: "검색기능 추가 예정",
+                                border: OutlineInputBorder()),
+                            onChanged: (value) => setState(() {
+                              searchText = value;
+                            }),
+                          ),
+                        ),
                       ],
                     ),
                     FutureBuilder(
@@ -236,71 +248,69 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               return SizedBox(
                                 height: screenHeight * 0.45,
                                 child: GridView.builder(
-                                    itemCount: snapshot.data!.length,
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 3),
-                                    itemBuilder: (context, index) {
-                                      return InkWell(
-                                        child: CircleAvatar(
-                                          backgroundColor: Colors.white,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                Icons.person,
-                                                size: 50,
-                                              ),
-                                              Text(snapshot.data![index].name),
-                                            ],
-                                          ),
-                                        ),
-                                        onTap: () async {
-                                          final returnData =
-                                              await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => Editpage(
-                                                name:
-                                                    snapshot.data![index].name,
-                                                pin: pinContacts,
-                                              ),
+                                  itemCount: snapshot.data!.length,
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 3),
+                                  itemBuilder: (context, index) {
+                                    return InkWell(
+                                      child: CircleAvatar(
+                                        backgroundColor: Colors.white,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.person,
+                                              size: 50,
                                             ),
-                                          );
-                                          setState(() {
-                                            pinContacts = returnData;
-                                          });
-                                        },
-                                        onLongPress: () => showDialog(
-                                            context: context,
-                                            builder: (context) => AlertDialog(
-                                                  content: Text("삭제하시겠습니까?"),
-                                                  actions: [
-                                                    TextButton(
-                                                        onPressed: () =>
-                                                            Navigator.pop(
-                                                                context),
-                                                        child: Text("취소")),
-                                                    TextButton(
-                                                        onPressed: () {
-                                                          deleteOne(
-                                                              snapshot
-                                                                  .data![index]
-                                                                  .name,
-                                                              index);
-                                                          pinContacts.remove(
-                                                              snapshot
-                                                                  .data![index]
-                                                                  .name);
+                                            Text(snapshot.data![index].name),
+                                          ],
+                                        ),
+                                      ),
+                                      onTap: () async {
+                                        final returnData = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => Editpage(
+                                              name: snapshot.data![index].name,
+                                              pin: pinContacts,
+                                            ),
+                                          ),
+                                        );
+                                        setState(() {
+                                          pinContacts = returnData;
+                                        });
+                                      },
+                                      onLongPress: () => showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                                content: Text("삭제하시겠습니까?"),
+                                                actions: [
+                                                  TextButton(
+                                                      onPressed: () =>
                                                           Navigator.pop(
-                                                              context);
-                                                        },
-                                                        child: Text("확인"))
-                                                  ],
-                                                )),
-                                      );
-                                    }),
+                                                              context),
+                                                      child: Text("취소")),
+                                                  TextButton(
+                                                      onPressed: () {
+                                                        deleteOne(
+                                                            snapshot
+                                                                .data![index]
+                                                                .name,
+                                                            index);
+                                                        pinContacts.remove(
+                                                            snapshot
+                                                                .data![index]
+                                                                .name);
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text("확인"))
+                                                ],
+                                              )),
+                                    );
+                                  },
+                                ),
                               );
                             }
                           } else if (snapshot.connectionState ==
