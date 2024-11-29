@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int count = 3;
   int size = 0;
   Future? myFuture;
-  List<String> pinContacts = ["테스트용1", "테스트용2"];
+  Future? pinFuture;
   String searchText = "";
 
   @override
@@ -33,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     _tabController = TabController(length: 2, vsync: this);
     myFuture = readContactsFromDatabase();
+    pinFuture = readPinContactsFromDatabase();
   }
 
   @override
@@ -131,48 +132,90 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           Expanded(
             child: TabBarView(controller: _tabController, children: [
-              GridView.builder(
-                  itemCount: pinContacts.length ?? 0,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3),
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      child: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Stack(
-                              children: [
-                                Icon(
-                                  Icons.person,
-                                  size: 50,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          setState(() {
+                            pinFuture = readPinContactsFromDatabase();
+                          });
+                        },
+                        icon: Icon(Icons.refresh)),
+                    FutureBuilder(
+                        future: pinFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.data == null) {
+                              return Text(
+                                  "Error Code[5000] : data null \n 에러 발생 개발자에게 문의 부탁드립니다");
+                            } else {
+                              return SizedBox(
+                                height: screenHeight * 0.45,
+                                child: GridView.builder(
+                                  itemCount: snapshot.data!.length,
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 3),
+                                  itemBuilder: (context, index) {
+                                    return InkWell(
+                                      child: CircleAvatar(
+                                        backgroundColor: Colors.white,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Stack(
+                                              children: [
+                                                Icon(
+                                                  Icons.person,
+                                                  size: 50,
+                                                ),
+                                                Positioned(
+                                                  right: -1,
+                                                  child: Icon(
+                                                    Icons.push_pin,
+                                                    size: 15,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Text(snapshot.data![index].name),
+                                          ],
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => Editpage(
+                                              name: snapshot.data![index].name,
+                                            ),
+                                          ),
+                                        );
+                                        // setState(() {
+                                        //   pinFuture = readPinContactsFromDatabase();
+                                        //   print("SET STATE 실행완료");
+                                        // });
+                                      },
+                                    );
+                                  },
                                 ),
-                                Positioned(
-                                  right: -1,
-                                  child: Icon(
-                                    Icons.push_pin,
-                                    size: 15,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Text(pinContacts[index]),
-                          ],
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Editpage(
-                              name: pinContacts[index],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  }),
+                              );
+                            }
+                          } else if (snapshot.connectionState ==
+                              ConnectionState.waiting)
+                            return CircularProgressIndicator();
+                          else {
+                            return Text(
+                                "Error Code[5001] : 에러발생 개발자에게 문의부탁드립니다");
+                          }
+                        }),
+                  ],
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -276,6 +319,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             ),
                                           ),
                                         );
+                                        setState(() {
+                                          pinFuture =
+                                              readPinContactsFromDatabase();
+                                        });
                                       },
                                       onLongPress: () => showDialog(
                                           context: context,
@@ -294,10 +341,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                                 .data![index]
                                                                 .name,
                                                             index);
-                                                        pinContacts.remove(
-                                                            snapshot
-                                                                .data![index]
-                                                                .name);
                                                         Navigator.pop(context);
                                                       },
                                                       child: Text("확인"))
@@ -333,6 +376,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<List<Memo>> readContactsFromDatabase() async {
     List<Memo> memosFromDatabase = await dbh.readMemos();
     return memosFromDatabase;
+  }
+
+  Future<List<Memo>> readPinContactsFromDatabase() async {
+    List<Memo> pinsFromDatabase = await dbh.readPins();
+    return pinsFromDatabase;
   }
 
   Future getPermission() async {

@@ -57,6 +57,7 @@ class _EditpageState extends State<Editpage> {
             ),
             IconButton(
                 onPressed: () {
+                  updateOnlypin();
                   Navigator.pop(context);
                 },
                 icon: const Icon(
@@ -135,6 +136,10 @@ class _EditpageState extends State<Editpage> {
   Future updateamemo() async {
     await dbh.updateMemo(
         Memo(id: id, name: name, content: content, pin: pin! ? 1 : 0));
+  }
+
+  void updateOnlypin() async {
+    await dbh.updateOnlyPin(name, pin);
   }
 
   Future<void> readPin() async {

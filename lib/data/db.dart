@@ -49,6 +49,22 @@ class DbHelper {
     });
   }
 
+  Future<List<Memo>> readPins() async {
+    Database db = await database;
+
+    List<Map<String, dynamic>> maps = await db.query('memos');
+    List<Memo> memos = [];
+    for (int i = 0; i < maps.length; i++) {
+      if (maps[i]['pin'] == 1)
+        memos.add(Memo(
+            id: maps[i]['id'],
+            name: maps[i]['name'],
+            content: maps[i]['content'],
+            pin: maps[i]['pin']));
+    }
+    return memos;
+  }
+
   Future<List<Memo>> readMemo(String name) async {
     Database db = await database;
 
@@ -76,14 +92,26 @@ class DbHelper {
     print(await db.query('memos'));
   }
 
-  Future<void> updatePin(Memo memo) async {
+  Future<void> updateOnlyPin(name, pin) async {
     Database db = await database;
+
+    List<Map<String, dynamic>> oldmaps =
+        await db.query('memos', where: 'name = ?', whereArgs: [name]);
+
+    Memo memo = Memo(
+        id: oldmaps[0]['id'],
+        name: oldmaps[0]['name'],
+        content: oldmaps[0]['content'],
+        pin: pin ? 1 : 0); //인자로 받은 pin값은 bool 타입이기때문에 정수형으로 변환
+
     db.update(
       'memos',
       memo.toMap(),
       where: 'id = ?',
       whereArgs: [memo.id],
     );
+
+    print(await db.query('memos'));
   }
 
   Future<void> deleteAllMemo() async {
