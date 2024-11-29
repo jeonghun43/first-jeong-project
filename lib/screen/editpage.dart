@@ -17,14 +17,13 @@ class _EditpageState extends State<Editpage> {
   String content = "";
   DbHelper dbh = DbHelper();
   Future? editFuture;
-  bool? isAlready;
-
+  bool pin = false;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     editFuture = readamemo();
-    isAlready = false; //우선은 false로 했지만 변경해야함
+    readPin();
   }
 
   _EditpageState(String name) {
@@ -47,12 +46,12 @@ class _EditpageState extends State<Editpage> {
             IconButton(
               onPressed: () {
                 setState(() {
-                  isAlready = !isAlready!;
+                  pin = !pin!;
                 });
               },
               icon: Icon(
-                isAlready! ? Icons.star : Icons.star_border,
-                color: isAlready! ? Colors.yellow : Colors.black,
+                pin! ? Icons.star : Icons.star_border,
+                color: pin! ? Colors.yellow : Colors.black,
                 size: 35,
               ),
             ),
@@ -128,15 +127,28 @@ class _EditpageState extends State<Editpage> {
 
   Future<List<Memo>> readamemo() async {
     var li = await dbh.readMemo(name);
+    content = li[0].content;
     print(li);
     return li;
   }
 
   Future updateamemo() async {
-    await dbh.updateMemo(Memo(id: id, name: name, content: content));
+    await dbh.updateMemo(
+        Memo(id: id, name: name, content: content, pin: pin! ? 1 : 0));
   }
 
-  Future insertamemo() async {
-    await dbh.insertMemo(Memo(id: id, name: name, content: content));
+  Future<void> readPin() async {
+    var li = await dbh.readMemo(name);
+    if (await li[0].pin == 1) {
+      setState(() {
+        pin = true;
+      });
+      print("pin값은 true");
+    } else {
+      setState(() {
+        pin = false;
+      });
+      print("pin값은 false");
+    }
   }
 }

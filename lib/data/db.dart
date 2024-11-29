@@ -22,7 +22,8 @@ class DbHelper {
           CREATE TABLE memos(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
-            content TEXT
+            content TEXT,
+            pin INTEGER
           )
         ''');
       },
@@ -43,7 +44,8 @@ class DbHelper {
       return Memo(
           id: maps[index]['id'],
           name: maps[index]['name'],
-          content: maps[index]['content']);
+          content: maps[index]['content'],
+          pin: maps[index]['pin']);
     });
   }
 
@@ -57,7 +59,8 @@ class DbHelper {
       return Memo(
           id: maps[index]['id'],
           name: maps[index]['name'],
-          content: maps[index]['content']);
+          content: maps[index]['content'],
+          pin: maps[index]['pin']);
     });
   }
 
@@ -71,6 +74,16 @@ class DbHelper {
     );
 
     print(await db.query('memos'));
+  }
+
+  Future<void> updatePin(Memo memo) async {
+    Database db = await database;
+    db.update(
+      'memos',
+      memo.toMap(),
+      where: 'id = ?',
+      whereArgs: [memo.id],
+    );
   }
 
   Future<void> deleteAllMemo() async {

@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int count = 3;
   int size = 0;
   Future? myFuture;
-  List<String> pinContacts = [];
+  List<String> pinContacts = ["테스트용1", "테스트용2"];
   String searchText = "";
 
   @override
@@ -203,8 +203,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   : b = true;
 
                               if (b) {
-                                await dbh.insertMemo(
-                                    Memo(name: data.displayName, content: ""));
+                                await dbh.insertMemo(Memo(
+                                    name: data.displayName,
+                                    content: "",
+                                    pin: 0));
                                 print("${data.displayName}추가함");
                               }
                               setState(() {
