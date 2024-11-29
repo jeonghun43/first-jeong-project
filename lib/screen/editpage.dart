@@ -5,9 +5,7 @@ import 'package:flutter/material.dart';
 class Editpage extends StatefulWidget {
   String name = "";
 
-  var pin;
-
-  Editpage({super.key, required this.name, required this.pin});
+  Editpage({super.key, required this.name});
 
   @override
   State<Editpage> createState() => _EditpageState(name);
@@ -19,7 +17,6 @@ class _EditpageState extends State<Editpage> {
   String content = "";
   DbHelper dbh = DbHelper();
   Future? editFuture;
-  var pinContacts;
   bool? isAlready;
 
   @override
@@ -27,7 +24,7 @@ class _EditpageState extends State<Editpage> {
     // TODO: implement initState
     super.initState();
     editFuture = readamemo();
-    isAlready = widget.pin.contains(name);
+    isAlready = false; //우선은 false로 했지만 변경해야함
   }
 
   _EditpageState(String name) {
@@ -61,11 +58,7 @@ class _EditpageState extends State<Editpage> {
             ),
             IconButton(
                 onPressed: () {
-                  if (isAlready!)
-                    widget.pin.contains(name) ? {} : widget.pin.add(name);
-                  else
-                    widget.pin.contains(name) ? widget.pin.remove(name) : {};
-                  Navigator.pop(context, widget.pin);
+                  Navigator.pop(context);
                 },
                 icon: const Icon(
                   Icons.dangerous_outlined,
@@ -75,11 +68,7 @@ class _EditpageState extends State<Editpage> {
             IconButton(
               onPressed: () {
                 updateamemo();
-                if (isAlready!)
-                  widget.pin.contains(name) ? {} : widget.pin.add(name);
-                else
-                  widget.pin.contains(name) ? widget.pin.remove(name) : {};
-                Navigator.pop(context, widget.pin);
+                Navigator.pop(context);
               },
               icon: const Icon(
                 Icons.save,

@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+//이 주석을 추가해줬습니다
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -160,19 +161,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           ],
                         ),
                       ),
-                      onTap: () async {
-                        final returnData = await Navigator.push(
+                      onTap: () {
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => Editpage(
                               name: pinContacts[index],
-                              pin: pinContacts,
                             ),
                           ),
                         );
-                        setState(() {
-                          pinContacts = returnData;
-                        });
                       },
                     );
                   }),
@@ -268,19 +265,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           ],
                                         ),
                                       ),
-                                      onTap: () async {
-                                        final returnData = await Navigator.push(
+                                      onTap: () {
+                                        Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) => Editpage(
                                               name: snapshot.data![index].name,
-                                              pin: pinContacts,
                                             ),
                                           ),
                                         );
-                                        setState(() {
-                                          pinContacts = returnData;
-                                        });
                                       },
                                       onLongPress: () => showDialog(
                                           context: context,
