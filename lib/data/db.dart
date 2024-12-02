@@ -22,7 +22,8 @@ class DbHelper {
           CREATE TABLE memos(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
-            content TEXT
+            content TEXT,
+            pin INTEGER
           )
         ''');
       },
@@ -43,8 +44,25 @@ class DbHelper {
       return Memo(
           id: maps[index]['id'],
           name: maps[index]['name'],
-          content: maps[index]['content']);
+          content: maps[index]['content'],
+          pin: maps[index]['pin']);
     });
+  }
+
+  Future<List<Memo>> readPins() async {
+    Database db = await database;
+
+    List<Map<String, dynamic>> maps = await db.query('memos');
+    List<Memo> memos = [];
+    for (int i = 0; i < maps.length; i++) {
+      if (maps[i]['pin'] == 1)
+        memos.add(Memo(
+            id: maps[i]['id'],
+            name: maps[i]['name'],
+            content: maps[i]['content'],
+            pin: maps[i]['pin']));
+    }
+    return memos;
   }
 
   Future<List<Memo>> readMemo(String name) async {
@@ -57,12 +75,52 @@ class DbHelper {
       return Memo(
           id: maps[index]['id'],
           name: maps[index]['name'],
-          content: maps[index]['content']);
+          content: maps[index]['content'],
+          pin: maps[index]['pin']);
     });
   }
 
+//여기부분 추가했는데 로직 확인해야함
+  Future<List<Memo>> readSimilarMemo(String str) async {
+    Database db = await database;
+
+    List<Map<String, dynamic>> maps =
+        await db.rawQuery('select * from memos where name like "%$str%"');
+
+    return List.generate(maps.length, (index) {
+      return Memo(
+          id: maps[index]['id'],
+          name: maps[index]['name'],
+          content: maps[index]['content'],
+          pin: maps[index]['pin']);
+    });
+  }
+//여기까지
+
   Future<void> updateMemo(Memo memo) async {
     Database db = await database;
+    db.update(
+      'memos',
+      memo.toMap(),
+      where: 'id = ?',
+      whereArgs: [memo.id],
+    );
+
+    print(await db.query('memos'));
+  }
+
+  Future<void> updateOnlyPin(name, pin) async {
+    Database db = await database;
+
+    List<Map<String, dynamic>> oldmaps =
+        await db.query('memos', where: 'name = ?', whereArgs: [name]);
+
+    Memo memo = Memo(
+        id: oldmaps[0]['id'],
+        name: oldmaps[0]['name'],
+        content: oldmaps[0]['content'],
+        pin: pin ? 1 : 0); //인자로 받은 pin값은 bool 타입이기때문에 정수형으로 변환
+
     db.update(
       'memos',
       memo.toMap(),

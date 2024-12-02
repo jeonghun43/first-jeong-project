@@ -133,6 +133,7 @@ class _TutorialPageState extends State<TutorialPage> {
   Future initInsertData() async {
     bool hasNoData;
     String name;
+    await dbh.deleteAllMemo(); //일단은 테스트를 위해 데이터 싹 다 밀고 다시 시작했음
     int size = await dbh.dbSize();
     if (size == 0) {
       size = _contacts.length;
@@ -141,7 +142,7 @@ class _TutorialPageState extends State<TutorialPage> {
         hasNoData = !(await dbh
             .isthereMemo(name)); //데이터베이스에 그 값이 들어가있는지 아닌지 확인후 추가할지 말지를 판단함
         if (hasNoData) {
-          await dbh.insertMemo(Memo(name: name, content: ""));
+          await dbh.insertMemo(Memo(name: name, content: "", pin: 0));
         }
       }
     }
