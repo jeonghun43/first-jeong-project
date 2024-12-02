@@ -195,10 +195,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             ),
                                           ),
                                         );
-                                        // setState(() {
-                                        //   pinFuture = readPinContactsFromDatabase();
-                                        //   print("SET STATE 실행완료");
-                                        // });
+                                        setState(() {
+                                          pinFuture =
+                                              readPinContactsFromDatabase();
+                                          print("SET STATE 실행완료");
+                                        });
                                       },
                                     );
                                   },
@@ -265,6 +266,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 fontWeight: FontWeight.w900),
                           ),
                         ),
+                        Container(
+                          width: screenWidth * 0.1,
+                        ),
                         SizedBox(
                           width: screenWidth * 0.45,
                           child: TextField(
@@ -279,7 +283,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ],
                     ),
                     FutureBuilder(
-                        future: myFuture,
+                        future: searchText.length == 0
+                            ? myFuture
+                            : similarMemoFuture(searchText),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.done) {
@@ -420,5 +426,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     setState(() {
       myFuture = readContactsFromDatabase();
     });
+  }
+
+  Future similarMemoFuture(String str) async {
+    var future = await dbh.readSimilarMemo(str);
+    return future;
   }
 }

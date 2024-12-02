@@ -80,6 +80,23 @@ class DbHelper {
     });
   }
 
+//여기부분 추가했는데 로직 확인해야함
+  Future<List<Memo>> readSimilarMemo(String str) async {
+    Database db = await database;
+
+    List<Map<String, dynamic>> maps =
+        await db.rawQuery('select * from memos where name like "%$str%"');
+
+    return List.generate(maps.length, (index) {
+      return Memo(
+          id: maps[index]['id'],
+          name: maps[index]['name'],
+          content: maps[index]['content'],
+          pin: maps[index]['pin']);
+    });
+  }
+//여기까지
+
   Future<void> updateMemo(Memo memo) async {
     Database db = await database;
     db.update(
